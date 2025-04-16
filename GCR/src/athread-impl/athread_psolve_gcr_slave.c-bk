@@ -1,0 +1,1033 @@
+#include "athread_param.h"
+
+#include "gcr.h"
+
+#include "slave.h"
+
+#include "stdio.h"
+
+__thread_local double reduce_buf_d  __attribute__ ((aligned(64)));
+
+void athread_kernel1_slave (struct KernelParam1* param) {
+
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* p   = param->p;
+  double* x0 = param->x0;
+
+  int jbegin = jts - 1;
+  int kbegin = kts - 1;
+  int ibegin = its - 1;
+
+  int range_i  = ite+2 - ibegin;
+  int range_k  = kte+2 - kbegin;
+  int range_j  = jte+2 - jbegin;
+
+  int range_ki = range_k * range_i;
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    p[index4b(i,k,j,0)] = x0[index_x(i,k,j)];
+  }
+  // para_jte1(h_p[index4b(i,k,j,0)]=x0[index_x(i,k,j)];)
+  return ;
+}
+
+void athread_kernel2_slave (struct KernelParam2* param) {
+
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* r  = param->r;
+  float* f0 = param->f0;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    r[index3(i,k,j)] = f0[index3(i,k,j)] - r[index3(i,k,j)];
+    // printf ("mytid: %d, k: %d [%d,%d); j: %d [%d,%d); i: %d [%d,%d)\n",
+    //     athread_tid,
+    //     k, kbegin, kte+2,
+    //     j, jbegin, jend+1,
+    //     i, ibegin, ite+1);
+  }
+  // para_jend(h_r[index3(i,k,j)]  = f0[index3(i,k,j)]-h_r[index3(i,k,j)];)
+  return ;
+}
+
+void athread_kernel3_slave (struct KernelParam3* param) {
+
+  int m   = param->m;
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* p = param->p;
+  float* r = param->r;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1 - ibegin;
+  int range_k  = kte+2 - kbegin;
+  int range_j  = jte+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    p[index4b(i,k,j,m)] = r[index3(i,k,j)];
+  }
+  // para_jte(h_p[index4b(i,k,j,m)] = h_r[index3(i,k,j)];)
+  return ;
+}
+
+void athread_kernel4_slave (struct KernelParam4* param) {
+
+  int iter_max = param->iter_max;
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* p = param->p;
+
+  int jbegin = jts - 1;
+  int kbegin = kts - 1;
+  int ibegin = its - 1;
+
+  int range_i  = ite+2 - ibegin;
+  int range_k  = kte+2 - kbegin;
+  int range_j  = jte+2 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    p[index4b(i,k,j,0)] = p[index4b(i,k,j,iter_max-1)];
+  }
+  // para_jte1(h_p[index4b(i,k,j,0)] = h_p[index4b(i,k,j,iter_max-1)];)
+  return ;
+}
+
+void athread_kernel5_slave (struct KernelParam5* param) {
+  int m      = param->m;
+  int its    = param->its;
+  int kts    = param->kts;
+  int jts    = param->jts;
+  int ite    = param->ite;
+  int kte    = param->kte;
+  int jte    = param->jte;
+  int ims    = param->ims;
+  int ime    = param->ime;
+  int jms    = param->jms;
+  int jend   = param->jend;
+  int NX     = param->NX;
+  int NY     = param->NY;
+  int NZ     = param->NZ;
+  double ac  = param->ac;
+  float* p   = param->p;
+  double* x0 = param->x0;
+
+  int jbegin = jts - 1;
+  int kbegin = kts - 1;
+  int ibegin = its - 1;
+
+  int range_i  = ite+2 - ibegin;
+  int range_k  = kte+2 - kbegin;
+  int range_j  = jte+2 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    x0[index_x(i,k,j)] = x0[index_x(i,k,j)] + ac * p[index4b(i,k,j,m)];
+  }
+  // x0[index_x(i,k,j)]= x0[index_x(i,k,j)]+ac * h_p[index4b(i,k,j,m)];
+  return ;
+}
+
+void athread_kernel6_slave (struct KernelParam6* param) {
+  int m     = param->m;
+  int its   = param->its;
+  int kts   = param->kts;
+  int jts   = param->jts;
+  int ite   = param->ite;
+  int kte   = param->kte;
+  int jte   = param->jte;
+  int ims   = param->ims;
+  int ime   = param->ime;
+  int jms   = param->jms;
+  int jend  = param->jend;
+  int NX    = param->NX;
+  int NY    = param->NY;
+  int NZ    = param->NZ;
+  double ac = param->ac;
+  float* r  = param->r;
+  float* ap = param->ap;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    r[index3(i,k,j)] = r[index3(i,k,j)]-ac * ap[index4(i,k,j,m)];
+  }
+  // h_r[index3(i,k,j)] = h_r[index3(i,k,j)]-ac * h_ap[index4(i,k,j,m)];
+  return ;
+}
+
+void athread_kernel7_slave (struct KernelParam7* param) {
+  int m       = param->m;
+  double* b   = param->b;
+  double* c2  = param->c2;
+  double* aps = param->aps;
+
+  int range = m + 1;
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    b[idx] = - c2[idx] / aps[idx];
+  }
+  return ;
+}
+
+void athread_kernel8_slave (struct KernelParam8* param) {
+  int l     = param->l;
+  int m     = param->m;
+  int its   = param->its;
+  int kts   = param->kts;
+  int jts   = param->jts;
+  int ite   = param->ite;
+  int kte   = param->kte;
+  int jte   = param->jte;
+  int ims   = param->ims;
+  int ime   = param->ime;
+  int jms   = param->jms;
+  int jend  = param->jend;
+  int NX    = param->NX;
+  int NY    = param->NY;
+  int NZ    = param->NZ;
+  float* p  = param->p;
+  double* b = param->b;
+
+  int jbegin = jts - 1;
+  int kbegin = kts - 1;
+  int ibegin = its - 1;
+
+  int range_i  = ite+2 - ibegin;
+  int range_k  = kte+2 - kbegin;
+  int range_j  = jte+2 - jbegin;
+
+  int range_ki = range_k * range_i;
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    p[index4b(i,k,j,m+1)] += b[l] * p[index4b(i,k,j,l)];
+  }
+  // h_p[index4b(i,k,j,m+1)]+=b[l]*h_p[index4b(i,k,j,l)];//)
+  return ;
+}
+
+void athread_kernel9_slave (struct KernelParam9* param) {
+  int its   = param->its;
+  int kts   = param->kts;
+  int jts   = param->jts;
+  int ite   = param->ite;
+  int kte   = param->kte;
+  int jte   = param->jte;
+  int ims   = param->ims;
+  int ime   = param->ime;
+  int jms   = param->jms;
+  int jend  = param->jend;
+  int NX    = param->NX;
+  int NY    = param->NY;
+  int NZ    = param->NZ;
+  float* r  = param->r;
+  float* f0 = param->f0;
+  float* ap = param->ap;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    r[index3(i,k,j)] = f0[index3(i,k,j)] - ap[index3(i,k,j)];
+  }
+  // para_jend(h_r[index3(i,k,j)]  = f0[index3(i,k,j)]- h_ap[index3(i,k,j)];)
+  return ;
+}
+
+void athread_kernel_reduce_d_slave (struct KernelReudceDParam* param) {
+
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* r  = param->r;
+  double* d = param->d;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  double tmp_d = 0.0;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    tmp_d += r[index3(i,k,j)] * r[index3(i,k,j)];
+  }
+
+	athread_ssync_array ();
+	athread_redurt (&tmp_d, &tmp_d, 1, athread_double, OP_add, &reduce_buf_d, 1);
+	if (athread_tid == 0) {
+		*d = tmp_d;
+	}
+	athread_ssync_array ();
+  return ;
+}
+
+void athread_kernel_reduce_c11_slave (struct KernelReudceC11Param* param) {
+
+  int m   = param->m;
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* r  = param->r;
+  float* ap = param->ap;
+  double* c11 = param->c11;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  double reduce = 0.0;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    reduce += r[index3(i,k,j)] * ap[index4(i,k,j,m)];
+  }
+
+	athread_ssync_array ();
+	athread_redurt (&reduce, &reduce, 1, athread_double, OP_add, &reduce_buf_d, 1);
+	if (athread_tid == 0) {
+		*c11 = reduce;
+	}
+	athread_ssync_array ();
+  return ;
+}
+
+void athread_kernel_reduce_c12_slave (struct KernelReudceC12Param* param) {
+
+  int m   = param->m;
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* ap = param->ap;
+  double* c12 = param->c12;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  double reduce = 0.0;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    reduce += ap[index4(i,k,j,m)] * ap[index4(i,k,j,m)];
+  }
+
+	athread_ssync_array ();
+	athread_redurt (&reduce, &reduce, 1, athread_double, OP_add, &reduce_buf_d, 1);
+	if (athread_tid == 0) {
+		*c12 = reduce;
+	}
+	athread_ssync_array ();
+  return ;
+}
+
+void athread_kernel_reduce_cl_slave (struct KernelReudceClParam* param) {
+
+  int l   = param->l;
+  int its = param->its;
+  int kts = param->kts;
+  int jts = param->jts;
+  int ite = param->ite;
+  int kte = param->kte;
+  int jte = param->jte;
+  int ims = param->ims;
+  int ime = param->ime;
+  int jms = param->jms;
+  int jend = param->jend;
+  int NX  = param->NX;
+  int NY  = param->NY;
+  int NZ  = param->NZ;
+  float* ar = param->ar;
+  float* ap = param->ap;
+  double* cl = param->cl;
+
+  int jbegin = jts;
+  int kbegin = kts - 1;
+  int ibegin = its;
+
+  int range_i  = ite+1  - ibegin;
+  int range_k  = kte+2  - kbegin;
+  int range_j  = jend+1 - jbegin;
+  int range_ki = range_k * range_i;
+
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  double reduce = 0.0;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j  = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k  = kbegin + idx_ki / range_i;
+    int i  = ibegin + idx_ki % range_i;
+    reduce += ar[index3(i,k,j)] * ap[index4(i,k,j,l)];
+  }
+  // para_jend(cl = cl + h_ar[index3(i,k,j)]*h_ap[index4(i,k,j,l)];)
+
+	athread_ssync_array ();
+	athread_redurt (&reduce, &reduce, 1, athread_double, OP_add, &reduce_buf_d, 1);
+	if (athread_tid == 0) {
+		*cl = reduce;
+	}
+	athread_ssync_array ();
+  return ;
+}
+
+void athread_kernel_reduce_norm2_slave (struct KernelReudceNorm2Param* param) {
+
+  int length     = param->len;
+  float* r       = param->r;
+  double* result = param->result;
+
+  int range = length;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  double reduce = 0.0;
+
+  for (int idx = start; idx < end; ++idx) {
+    reduce += r[idx] * r[idx];
+  }
+
+	athread_ssync_array ();
+	athread_redurt (&reduce, &reduce, 1, athread_double, OP_add, &reduce_buf_d, 1);
+	if (athread_tid == 0) {
+		*result = reduce;
+	}
+	athread_ssync_array ();
+  return ;
+}
+
+void athread_matrixpro_kts_slave (struct MatrixProParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float* a = param->a;
+  float* b = param->b;
+  float* c = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+
+  int range = range_j * range_i;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  int k = kts - 1;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_i;
+    int i = ibegin + idx % range_i;
+    c[index3(i,k,j)] =
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(15,i,k,j)] * b[index3b(i  ,k+1,j  )]
+        + a[index_a(16,i,k,j)] * b[index3b(i-1,k+1,j  )]
+        + a[index_a(17,i,k,j)] * b[index3b(i+1,k+1,j  )]
+        + a[index_a(18,i,k,j)] * b[index3b(i  ,k+1,j-1)]
+        + a[index_a(19,i,k,j)] * b[index3b(i  ,k+1,j+1)];
+  }
+  return ;
+}
+
+void athread_matrixpro_kts_kte_slave (struct MatrixProParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float* a = param->a;
+  float* b = param->b;
+  float* c = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+  int kbegin = kts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+  int range_k = kte  + 1 - kbegin;
+
+  int range_ki = range_k * range_i;
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k = kbegin + idx_ki / range_i;
+    int i = ibegin + idx_ki % range_i;
+    c[index3(i,k,j)] =
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(10,i,k,j)] * b[index3b(i  ,k-1,j  )]
+        + a[index_a(11,i,k,j)] * b[index3b(i-1,k-1,j  )]
+        + a[index_a(12,i,k,j)] * b[index3b(i+1,k-1,j  )]
+        + a[index_a(13,i,k,j)] * b[index3b(i  ,k-1,j-1)]
+        + a[index_a(14,i,k,j)] * b[index3b(i  ,k-1,j+1)]
+        + a[index_a(15,i,k,j)] * b[index3b(i  ,k+1,j  )]
+        + a[index_a(16,i,k,j)] * b[index3b(i-1,k+1,j  )]
+        + a[index_a(17,i,k,j)] * b[index3b(i+1,k+1,j  )]
+        + a[index_a(18,i,k,j)] * b[index3b(i  ,k+1,j-1)]
+        + a[index_a(19,i,k,j)] * b[index3b(i  ,k+1,j+1)];
+  }
+  return ;
+}
+
+void athread_matrixpro_kte_slave (struct MatrixProParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float* a = param->a;
+  float* b = param->b;
+  float* c = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+
+  int range = range_j * range_i;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  int k = kte + 1;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_i;
+    int i = ibegin + idx % range_i;
+    c[index3(i,k,j)]  =                                 
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(10,i,k,j)] * b[index3b(i  ,k-1,j  )]
+        + a[index_a(11,i,k,j)] * b[index3b(i-1,k-1,j  )]
+        + a[index_a(12,i,k,j)] * b[index3b(i+1,k-1,j  )]
+        + a[index_a(13,i,k,j)] * b[index3b(i  ,k-1,j-1)]
+        + a[index_a(14,i,k,j)] * b[index3b(i  ,k-1,j+1)];
+  }
+  return ;
+}
+
+void athread_matrixpro_double_kts_slave (struct MatrixProDoubleParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float*  a = param->a;
+  double* b = param->b;
+  float*  c = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+
+  int range = range_j * range_i;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  int k = kts - 1;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_i;
+    int i = ibegin + idx % range_i;
+    c[index3(i,k,j)] =
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(15,i,k,j)] * b[index3b(i  ,k+1,j  )]
+        + a[index_a(16,i,k,j)] * b[index3b(i-1,k+1,j  )]
+        + a[index_a(17,i,k,j)] * b[index3b(i+1,k+1,j  )]
+        + a[index_a(18,i,k,j)] * b[index3b(i  ,k+1,j-1)]
+        + a[index_a(19,i,k,j)] * b[index3b(i  ,k+1,j+1)];
+  }
+  return ;
+}
+
+void athread_matrixpro_double_kts_kte_slave (struct MatrixProDoubleParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float* a  = param->a;
+  double* b = param->b;
+  float* c  = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+  int kbegin = kts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+  int range_k = kte  + 1 - kbegin;
+
+  int range_ki = range_k * range_i;
+  int range = range_j * range_ki;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_ki;
+    int idx_ki = idx % range_ki;
+    int k = kbegin + idx_ki / range_i;
+    int i = ibegin + idx_ki % range_i;
+    c[index3(i,k,j)] =
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(10,i,k,j)] * b[index3b(i  ,k-1,j  )]
+        + a[index_a(11,i,k,j)] * b[index3b(i-1,k-1,j  )]
+        + a[index_a(12,i,k,j)] * b[index3b(i+1,k-1,j  )]
+        + a[index_a(13,i,k,j)] * b[index3b(i  ,k-1,j-1)]
+        + a[index_a(14,i,k,j)] * b[index3b(i  ,k-1,j+1)]
+        + a[index_a(15,i,k,j)] * b[index3b(i  ,k+1,j  )]
+        + a[index_a(16,i,k,j)] * b[index3b(i-1,k+1,j  )]
+        + a[index_a(17,i,k,j)] * b[index3b(i+1,k+1,j  )]
+        + a[index_a(18,i,k,j)] * b[index3b(i  ,k+1,j-1)]
+        + a[index_a(19,i,k,j)] * b[index3b(i  ,k+1,j+1)];
+  }
+  return ;
+}
+
+void athread_matrixpro_double_kte_slave (struct MatrixProDoubleParam* param) {
+  int its = param->its;
+  int ite = param->ite;
+  int jts = param->jts;
+  int jte = param->jte;
+  int kts = param->kts;
+  int kte = param->kte;
+  int jend = param->jend;
+  float* a  = param->a;
+  double* b = param->b;
+  float* c  = param->c;
+
+  int NX = ite - its + 3;
+  int NY = kte - kts + 3;
+
+  int ibegin = its;
+  int iend   = ite;
+  int jbegin = jts;
+
+  int range_j = jend + 1 - jbegin;
+  int range_i = iend + 1 - ibegin;
+
+  int range = range_j * range_i;
+
+  int len = (range + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < range ? (start + len) : range;
+
+  int k = kte + 1;
+
+  for (int idx = start; idx < end; ++idx) {
+    int j = jbegin + idx / range_i;
+    int i = ibegin + idx % range_i;
+    c[index3(i,k,j)]  =                                 
+        + a[index_a(1 ,i,k,j)] * b[index3b(i  ,k  ,j  )]
+        + a[index_a(2 ,i,k,j)] * b[index3b(i-1,k  ,j  )]
+        + a[index_a(3 ,i,k,j)] * b[index3b(i+1,k  ,j  )]
+        + a[index_a(4 ,i,k,j)] * b[index3b(i  ,k  ,j-1)]
+        + a[index_a(5 ,i,k,j)] * b[index3b(i  ,k  ,j+1)]
+        + a[index_a(6 ,i,k,j)] * b[index3b(i+1,k  ,j+1)]
+        + a[index_a(7 ,i,k,j)] * b[index3b(i+1,k  ,j-1)]
+        + a[index_a(8 ,i,k,j)] * b[index3b(i-1,k  ,j-1)]
+        + a[index_a(9 ,i,k,j)] * b[index3b(i-1,k  ,j+1)]
+        + a[index_a(10,i,k,j)] * b[index3b(i  ,k-1,j  )]
+        + a[index_a(11,i,k,j)] * b[index3b(i-1,k-1,j  )]
+        + a[index_a(12,i,k,j)] * b[index3b(i+1,k-1,j  )]
+        + a[index_a(13,i,k,j)] * b[index3b(i  ,k-1,j-1)]
+        + a[index_a(14,i,k,j)] * b[index3b(i  ,k-1,j+1)];
+  }
+  return ;
+}
+
+#define index_yl(i,k,j,m) (i-1+(k-1)*ni+(j-1)*ni*nk +(m)*(ni*nk*nj))
+#define index_b(i,k,j,m) (i-1+(k-1)*ni+(j-1)*ni*nk+(m-1)*ni*nk*nj)
+void athread_svrasr_slave (struct SvrasrParam* param) {
+  float* yl = param->yl;
+  float* b  = param->b;
+  int m  = param->m;
+  int ni = param->ni;
+  int nk = param->nk;
+  int nj = param->nj;
+
+  int ng = ni * nk * nj;
+  int len = (nj + 63) / 64;
+
+  int start = athread_tid * len;
+  int end   = (start + len) < nj ? (start + len) : nj;
+
+  int i, k, j;
+  for (int j = start + 1; j <= end; ++j) {
+    for (i = 2; i <= ni; i++) {
+      yl[index_yl(i,1,j,m)] = yl[index_yl(i,1,j,m)] - 
+          b[index_b(i,1,j,2)] * yl[index_yl(i-1,1,j,m)];
+    }
+    for (k = 2; k <= nk; k++) {
+      for(i=1;i<=ni;i++) {
+        yl[index_yl(i,k,j,m)] = yl[index_yl(i,k,j,m)] - 
+            b[index_b(i,k,j,4) ] *yl[index_yl(i,k-1,j,m)];
+      }
+      for (i = 2; i <= ni; i++) {
+        yl[index_yl(i,k,j,m)] = yl[index_yl(i,k,j,m)] - 
+            b[index_b(i,k,j,2)] * yl[index_yl(i-1,k,j,m)];
+      }
+    }
+  }
+
+  if (end == nj) {
+    // TODO bug
+    yl[index_yl(ni,nk,nj,m)] = yl[index_yl(ni,nk,nj,m)] * b[index_b(ni,nk,nj,1)];
+  }
+
+  for (int j = end; j >= start + 1; --j) {
+    for (i = ni-1; i >= 1; i -= 1) {
+      yl[index_yl(i,nk,j,m)] = (yl[index_yl(i,nk,j,m)] - 
+          b[index_b(i,nk,j,3)] * yl[index_yl(i+1,nk,j,m)]) * b[index_b(i,nk,j,1)];
+    }
+
+    for (k = nk-1; k >= 1; k -= 1) {
+      for (i = 1; i <= ni; i++) {
+        yl[index_yl(i,k,j,m)] = yl[index_yl(i,k,j,m)] -
+            b[index_b(i,k,j,5)] * yl[index_yl(i,k+1,j,m)];
+      }
+      yl[index_yl(ni,k,j,m)] = yl[index_yl(ni,k,j,m)] * b[index_b(ni,k,j,1)];
+      for (i = ni-1; i >= 1; i -= 1) {
+        yl[index_yl(i,k,j,m)] = (yl[index_yl(i,k,j,m)] - 
+            b[index_b(i,k,j,3)] * yl[index_yl(i+1,k,j,m)]) * b[index_b(i,k,j,1)];
+      }
+    }
+  }
+  return ;
+}
+#undef index_yl
+#undef index_b

@@ -1,0 +1,46 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_FastThreadSpawn.c" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_FastThreadSpawn.c.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_FastThreadSpawn.c.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_KernelLaunch.c" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch.c.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch.c.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_KernelLaunch_SlaveC.c" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch_SlaveC.c.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch_SlaveC.c.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_FastThreadSpawn_Slave.c" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_FastThreadSpawn_Slave.c.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_FastThreadSpawn_Slave.c.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_HashTable_Host.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_HashTable_Host.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_HashTable_Host.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_HashTable_Slave.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_HashTable_Slave.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_HashTable_Slave.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_KernelLaunch_Slave.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch_Slave.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_KernelLaunch_Slave.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_Task.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_Task.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_Task.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Athread/Kokkos_Athread_Utils_Slave.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_Utils_Slave.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Athread/Kokkos_Athread_Utils_Slave.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Serial/Kokkos_Serial.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Serial/Kokkos_Serial.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Serial/Kokkos_Serial.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/Serial/Kokkos_Serial_Task.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Serial/Kokkos_Serial_Task.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/Serial/Kokkos_Serial_Task.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_CPUDiscovery.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_CPUDiscovery.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Command_Line_Parsing.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Command_Line_Parsing.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Command_Line_Parsing.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Core.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Core.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Error.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Error.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_ExecPolicy.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_ExecPolicy.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_HostBarrier.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostBarrier.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_HostSpace.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_HostSpace_deepcopy.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostSpace_deepcopy.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_HostThreadTeam.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_HostThreadTeam.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_MemoryPool.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemoryPool.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_MemorySpace.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_MemorySpace.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Profiling.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Profiling.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_SharedAlloc.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_SharedAlloc.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Spinwait.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Spinwait.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_Stacktrace.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_Stacktrace.cpp.o.d"
+  "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/CG/swKokkos-4.1.00/core/src/impl/Kokkos_hwloc.cpp" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o" "gcc" "swKokkos-4.1.00/core/src/CMakeFiles/kokkoscore.dir/impl/Kokkos_hwloc.cpp.o.d"
+  )
+
+# Targets to which this target links.
+set(CMAKE_TARGET_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

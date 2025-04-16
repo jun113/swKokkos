@@ -1,0 +1,9 @@
+./run
+#sbatch -n 40 -p debug --exclusive ./run.sh
+
+#!/usr/bin/bash
+
+#echo "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/LICOM/logfile/10km"
+#echo "/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/LICOM/logfile/10km/20250416-104314-OCEANLIGHT.out"
+
+#watch bjobs

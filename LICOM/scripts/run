@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+outName=/home/export/base/shisuan/swiap/online/wjl/swKokkos-paper/swKokkos-AD/LICOM/logfile/10km/20250416-104314-OCEANLIGHT
+
+out_licom=${outName}.out
+
+# echo ${out_licom}
+#echo ${output} | xclip -sel clip
+
+cd ../run/
+
+# sed -i -e "/nprocs_/s/[0-9]\+/1560/" ocn.parm
+export SWCH_USE_HW_COLL=0
+
+rm -f ocn.log
+
+bsub -J wjl-new-10km \
+	-p -b  -cache_size 128 \
+	-q q_swgbcm \
+	-n 1560 \
+	-cgsp 64 \
+	-share_size 15360 \
+	-host_stack 2048 \
+	-o ${out_licom} ./licomkpp
+
+# bsub -J licom3-10km \
+# 	-p -b -cache_size 128 \
+# 	-q q_swiap \
+# 	-n 1560 \
+# 	-cgsp 64 \
+# 	-share_size 15360 \
+# 	-host_stack 2048 \
+# 	-o ${out_licom} ./licomkpp
+
+echo ${out_licom}
+
+#watch bjobs

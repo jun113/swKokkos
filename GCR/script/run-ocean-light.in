@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+
+CUR_DATE=$(date +'%Y%m%d-%H%M%S')
+outName=$(pwd)/${CUR_DATE}-SW.out
+
+# echo ${out_licom}
+#echo ${output} | xclip -sel clip
+
+#cp ../input_data/demo64_out/ic_64.dat ../build/bin/.
+#cp ../input_data/demo64_out/lcdm_n1  ../build/bin/.
+
+# cd ../run/
+
+# sed -i -e "/nprocs_/s/[0-9]\+/@NUM_PROCE@/" ocn.parm
+
+# rm -f ocn.log
+#-I
+
+# [ ! -d "output" ] && mkdir output
+
+bsub -J wjl-@PROJECT_NAME@ \
+	-p -b -I -cache_size 128 \
+        -n 6 \
+	-q q_share \
+	-cross \
+	-cgsp 64 \
+	-share_size 15360 \
+	-host_stack 2048 \
+	-o ${outName} ./../build/bin/@PROJECT_NAME@
+
+echo ${outName}
+
+	# -np 6 \
+	# -N 2 \
+
+#watch bjobs

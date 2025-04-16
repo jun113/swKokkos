@@ -1,0 +1,8 @@
+sbatch ./run
+
+#!/usr/bin/bash
+
+echo "@LOG_DIR@/"
+echo "@LOG_DIR@/@MACHINE@"
+
+watch -d squeue

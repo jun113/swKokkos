@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "kokkos/swKokkos-4.1.00-opt/simd",
+		"source" : "kokkos/swKokkos-4.1.00-opt/simd"
+	}
+}

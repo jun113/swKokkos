@@ -1,0 +1,38 @@
+#!/usr/bin/bash
+
+CUR_DATE=$(date +'%Y%m%d-%H%M%S')
+outName=$(pwd)/${CUR_DATE}-SW.out
+
+# echo ${out_licom}
+#echo ${output} | xclip -sel clip
+
+cd ../run/
+
+# sed -i -e "/nprocs_/s/[0-9]\+/@NUM_PROCE@/" ocn.parm
+
+# rm -f ocn.log
+
+[ ! -d "output" ] && mkdir output
+
+nx=256; 
+ny=128;
+nz=128;
+re=400; # Reynolds number
+tol=0.001; # steady state tolerance 
+# max_steps=5000;
+max_steps=100;
+# output_rate=1000; 
+output_rate=1; 
+
+bsub -J wjl-@PROJECT_NAME@ \
+	-p -b -I -cache_size 128 \
+	-q q_swgbcm \
+	-n 1 \
+	-cgsp 64 \
+	-share_size 15360 \
+	-host_stack 2048 \
+	-o ${outName} ./../build/bin/@PROJECT_NAME@ $nx $ny $nz $re $tol $max_steps $output_rate
+
+echo ${outName}
+
+# watch bjobs

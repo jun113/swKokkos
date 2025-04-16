@@ -1,0 +1,9 @@
+./run
+#sbatch -n 40 -p debug --exclusive ./run.sh
+
+#!/usr/bin/bash
+
+echo "/"
+echo "//-OCEANLIGHT.out"
+
+watch djob

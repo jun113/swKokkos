@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+outName=@LOG_DIR@/@LICOM_RES@/@CUR_DATE@-@MACHINE@
+
+out_licom=${outName}.out
+
+# echo ${out_licom}
+#echo ${output} | xclip -sel clip
+
+cd ../run/
+
+# sed -i -e "/nprocs_/s/[0-9]\+/@NUM_PROCE@/" ocn.parm
+export SWCH_USE_HW_COLL=0
+
+rm -f ocn.log
+
+bsub -J wjl-new-@LICOM_RES@ \
+	-p -b  -cache_size 128 \
+	-q q_swgbcm \
+	-n @NUM_PROCE@ \
+	-cgsp 64 \
+	-share_size 15360 \
+	-host_stack 2048 \
+	-o ${out_licom} ./@PROJECT_NAME@
+
+# bsub -J licom3-@LICOM_RES@ \
+# 	-p -b -cache_size 128 \
+# 	-q q_swiap \
+# 	-n @NUM_PROCE@ \
+# 	-cgsp 64 \
+# 	-share_size 15360 \
+# 	-host_stack 2048 \
+# 	-o ${out_licom} ./@PROJECT_NAME@
+
+echo ${out_licom}
+
+#watch bjobs

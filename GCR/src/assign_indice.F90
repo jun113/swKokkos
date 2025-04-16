@@ -1,0 +1,25 @@
+subroutine assign_indices(ijk_index)
+        use h1
+        integer, dimension(20), intent(in) :: ijk_index
+
+        idep = ijk_index(1)
+        jdep = ijk_index(2)
+        ids = ijk_index(3)
+        ide = ijk_index(4)
+        jds = ijk_index(5)
+        jde = ijk_index(6)
+        kds = ijk_index(7)
+        kde = ijk_index(8)
+        ims = ijk_index(9)
+        ime = ijk_index(10)
+        jms = ijk_index(11)
+        jme = ijk_index(12)
+        kms = ijk_index(13)
+        kme = ijk_index(14)
+        its = ijk_index(15)
+        ite = ijk_index(16)
+        jts = ijk_index(17)
+        jte = ijk_index(18)
+        kts = ijk_index(19)
+        kte = ijk_index(20)
+end subroutine assign_indices
